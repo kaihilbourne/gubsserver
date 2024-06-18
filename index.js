@@ -1,42 +1,28 @@
-const express = require('express');
-const { createServer } = require('node:http');
-const { join } = require('node:path');
-const { Server } = require('socket.io');
-const cors = require('cors');
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set } from "firebase/database";
 
-const app = express();
-const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET","POST"]
-  }
-});
+const firebaseConfig = {
+    apiKey: "AIzaSyBtYu3SY_XTXzDc3lK09944M_qfdIqJyIA",
+    authDomain: "gubs-online.firebaseapp.com",
+    databaseURL: "https://gubs-online-default-rtdb.firebaseio.com",
+    projectId: "gubs-online",
+    storageBucket: "gubs-online.appspot.com",
+    messagingSenderId: "936911098464",
+    appId: "1:936911098464:web:cec4a62476f0b60c362905",
+    measurementId: "G-6W7G04G51N"
+};
 
-app.use(cors());
+const app = initializeApp(firebaseConfig);
 
-// app.get('/', (req, res) => {
-//   res.sendFile(join(__dirname, 'index.html'));
-// });
 
-io.on('connection', (socket) => {
-  console.log('a user connected');
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
-});
+function updateUserScores(userID,uname,gamerecord){
+    const db = getDatabase();
+    const reference = ref(db,"users/"+userID);
+    
 
-let id = 0;
 
-io.on('connection', (socket) => {
-  id += 1;
-  let uid = "user" + id.toString();
-  socket.on('chat message', (msg) => {
-    io.emit('chat message',msg+uid);
-    console.log(msg);
-  });
-});
+    set(reference, {
+        username: uname,
 
-server.listen(4000, () => {
-  console.log('server running at http://localhost:4000');
-});
+    });
+}
